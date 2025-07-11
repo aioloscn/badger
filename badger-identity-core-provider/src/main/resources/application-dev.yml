@@ -17,4 +17,4 @@ spring:
         group: DEFAULT_GROUP
   config:
     import: 
-      - optional:nacos:live-account-provider-config.yaml
+      - optional:nacos:badger-identity-core-provider-config.yaml

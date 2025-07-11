@@ -21,7 +21,7 @@
 #    name: dubbo
 #    port: 29931
 #  application:
-#    name: dubbo-live-account-provider
+#    name: dubbo-badger-identity-core-provider
 #    qos-enable: false
 #  registry:
 #    address: nacos://${config.nacos.host}?namespace=live-test&username=nacos&password=nacos

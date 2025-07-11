@@ -47,7 +47,7 @@
     </dependencies>
 
     <build>
-        <finalName>badger-id-generator-provider</finalName>
+        <finalName>badger-id-generator-provider-docker</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

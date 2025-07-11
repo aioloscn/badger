@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.aiolos</groupId>
-            <artifactId>common-redis-starter</artifactId>
+            <artifactId>common-redis</artifactId>
         </dependency>
     </dependencies>
 </project>

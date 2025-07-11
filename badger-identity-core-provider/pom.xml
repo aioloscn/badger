@@ -24,14 +24,6 @@
         </dependency>
         <dependency>
             <groupId>com.aiolos</groupId>
-            <artifactId>badger-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.aiolos</groupId>
-            <artifactId>badger-service</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.aiolos</groupId>
             <artifactId>badger-identity-core-api</artifactId>
         </dependency>
 
@@ -46,7 +38,7 @@
     </dependencies>
     
     <build>
-        <finalName>badger-identity-core-provider</finalName>
+        <finalName>badger-identity-core-provider-docker</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
