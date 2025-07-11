@@ -1,0 +1,18 @@
+services:
+  badger-identity-core-provider-docker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: 'badger-identity-core-provider-docker:latest'
+    environment:
+      - spring.cloud.nacos.discovery.ip=${DEV_HOST} # 不同物理机必须明确指定IP
+      - DUBBO_IP_TO_REGISTRY=${DEV_HOST}
+      - DUBBO_PORT_TO_BIND=29931            # 容器内 Dubbo 服务绑定的端口（会覆盖 dubbo.protocol.port）
+      - NACOS_HOST=${DEV_HOST}
+      - MYSQL_HOST=${DEV_HOST}
+      - REDIS_HOST=${DEV_HOST}
+      - JAVA_OPTS=-XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xms256m -Xmx256m -Xmn128m -Xss256k
+    ports:
+      - '29931:29931'
+    volumes:
+      - D:\tmp\logs\badger-identity-core-provider:/tmp/logs/badger-identity-core-provider

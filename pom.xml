@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.aiolos</groupId>
+  <artifactId>badger</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  
+  <packaging>pom</packaging>
+  <modules>
+    <module>badger-common</module>
+    <module>badger-enums</module>
+    <module>badger-model</module>
+    <module>badger-service</module>
+    <module>badger-id-generator-api</module>
+    <module>badger-id-generator-provider</module>
+    <module>badger-identity-core-api</module>
+    <module>badger-identity-core-provider</module>
+  </modules>
+
+  <properties>
+    <mysql.version>8.0.28</mysql.version>
+    <mybatis-plus.version>3.5.5</mybatis-plus.version>
+    <sharding.jdbc.version>5.3.2</sharding.jdbc.version>
+
+    <badger-common.version>1.0-SNAPSHOT</badger-common.version>
+    <badger-enums.version>1.0-SNAPSHOT</badger-enums.version>
+    <badger-model.version>1.0-SNAPSHOT</badger-model.version>
+    <badger-service.version>1.0-SNAPSHOT</badger-service.version>
+    <badger-id-generator-api.version>1.0-SNAPSHOT</badger-id-generator-api.version>
+    <badger-id-generator-provider.version>1.0-SNAPSHOT</badger-id-generator-provider.version>
+    <badger-identity-core-api.version>1.0-SNAPSHOT</badger-identity-core-api.version>
+    <badger-identity-core-provider.version>1.0-SNAPSHOT</badger-identity-core-provider.version>
+  </properties>
+
+  <parent>
+    <groupId>com.aiolos</groupId>
+    <artifactId>common</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-common</artifactId>
+        <version>${badger-common.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-enums</artifactId>
+        <version>${badger-enums.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-model</artifactId>
+        <version>${badger-model.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-service</artifactId>
+        <version>${badger-service.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-id-generator-api</artifactId>
+        <version>${badger-id-generator-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-id-generator-provider</artifactId>
+        <version>${badger-id-generator-provider.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-identity-core-api</artifactId>
+        <version>${badger-identity-core-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-identity-core-provider</artifactId>
+        <version>${badger-identity-core-provider.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
