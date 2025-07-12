@@ -1,0 +1,8 @@
+server:
+  port: 9911
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: badger-user-provider

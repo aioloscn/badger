@@ -9,12 +9,15 @@
   <modules>
     <module>badger-common</module>
     <module>badger-enums</module>
+    <module>badger-mq</module>
     <module>badger-model</module>
     <module>badger-service</module>
     <module>badger-id-generator-api</module>
     <module>badger-id-generator-provider</module>
     <module>badger-identity-core-api</module>
     <module>badger-identity-core-provider</module>
+    <module>badger-user-api</module>
+    <module>badger-user-provider</module>
   </modules>
 
   <properties>
@@ -24,12 +27,15 @@
 
     <badger-common.version>1.0-SNAPSHOT</badger-common.version>
     <badger-enums.version>1.0-SNAPSHOT</badger-enums.version>
+    <badger-mq.version>1.0-SNAPSHOT</badger-mq.version>
     <badger-model.version>1.0-SNAPSHOT</badger-model.version>
     <badger-service.version>1.0-SNAPSHOT</badger-service.version>
     <badger-id-generator-api.version>1.0-SNAPSHOT</badger-id-generator-api.version>
     <badger-id-generator-provider.version>1.0-SNAPSHOT</badger-id-generator-provider.version>
     <badger-identity-core-api.version>1.0-SNAPSHOT</badger-identity-core-api.version>
     <badger-identity-core-provider.version>1.0-SNAPSHOT</badger-identity-core-provider.version>
+    <badger-user-api.version>1.0-SNAPSHOT</badger-user-api.version>
+    <badger-user-provider.version>1.0-SNAPSHOT</badger-user-provider.version>
   </properties>
 
   <parent>
@@ -49,6 +55,11 @@
         <groupId>com.aiolos</groupId>
         <artifactId>badger-enums</artifactId>
         <version>${badger-enums.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-mq</artifactId>
+        <version>${badger-mq.version}</version>
       </dependency>
       <dependency>
         <groupId>com.aiolos</groupId>
@@ -79,6 +90,16 @@
         <groupId>com.aiolos</groupId>
         <artifactId>badger-identity-core-provider</artifactId>
         <version>${badger-identity-core-provider.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-user-api</artifactId>
+        <version>${badger-user-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.aiolos</groupId>
+        <artifactId>badger-user-provider</artifactId>
+        <version>${badger-user-provider.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

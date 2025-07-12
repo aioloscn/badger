@@ -1,0 +1,74 @@
+#config:
+#  nacos:
+#    host: ${NACOS_HOST:127.0.0.1}:18848
+#  rocketmq:
+#    host: ${ROCKETMQ_HOST:127.0.0.1}:9876
+#
+#spring:
+#  cloud:
+#    stream:
+#      bindings:
+#        cacheAsyncDelete-in-0:
+#          destination: badger-user-provider-cache-async-delete-topic
+#          group: cache-async-delete-group
+#          content-type: application/json
+#          consumer:
+#            max-attempts: 1 # 重试次数（包括首次消费）
+#            back-off-initial-interval: 1000 # 重试间隔时间（毫秒）
+#        cacheAsyncDelete-out-0:
+#          destination: badger-user-provider-cache-async-delete-topic
+#          content-type: application/json
+#      rocketmq:
+#        binder:
+#          name-server: ${config.rocketmq.host}
+#          enable-msg-trace: true
+#  datasource:
+#    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+#    url: jdbc:shardingsphere:nacos:${config.nacos.host}:badger-user-provider-sharding-jdbc.yaml?username=nacos&password=nacos&namespace=live-test&group=DEFAULT_GROUP
+#    hikari:
+#      pool-name: db-user
+#      idle-timeout: 300000
+#      minimum-idle: 10
+#      maximum-pool-size: 50
+#      connection-timeout: 30000
+#  data:
+#    redis:
+#      port: 6379
+#      host: ${REDIS_HOST:127.0.0.1}
+#      database: 0
+#      lettuce:
+#        pool:
+#          min-idle: 10
+#          max-idle: 100
+#          max-active: 100
+#
+#dubbo:
+#  protocol:
+#    name: dubbo
+#    port: 29911
+#    threadpool: fixed
+#    dispatcher: execution
+#    threads: 500
+#    accepts: 500
+#  application:
+#    name: dubbo-badger-user-provider
+#    qos-enable: false
+#  registry:
+#    address: nacos://${config.nacos.host}?namespace=live-test&username=nacos&password=nacos
+#  consumer:
+#    retries: 2    # 默认2
+#    timeout: 5000 # 全局默认超时，控制消费者调用服务时的等待时间
+#    check: false
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health
+#  endpoint:
+#    health:
+#      show-details: always
+#
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

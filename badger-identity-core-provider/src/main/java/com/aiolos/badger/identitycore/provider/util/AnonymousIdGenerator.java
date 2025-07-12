@@ -1,4 +1,4 @@
-package com.aiolos.badger.identitycore.provider.utils;
+package com.aiolos.badger.identitycore.provider.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,0 +1,52 @@
+#dataSources:
+#  badger-master:
+#    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    jdbcUrl: jdbc:mysql://master.mysql.com:3307/badger?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+#    username: root
+#    password: root
+#  badger-slave0:
+#    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    jdbcUrl: jdbc:mysql://slave.mysql.com:3308/badger?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+#    username: root
+#    password: root
+#
+#rules:
+#  - !READWRITE_SPLITTING
+#    dataSources:
+#      badger:
+#        staticStrategy:
+#          writeDataSourceName: badger-master
+#          readDataSourceNames:
+#            - badger-slave0
+#  - !SINGLE
+#    defaultDataSource: badger # 默认数据源，未分片表默认走的数据源
+#  - !SHARDING
+#    tables:
+##      t_order: db_order 如果引入其他数据源的其他表，配置表名：数据源名称
+#      user:
+#        actualDataNodes: badger.user_$->{(0..99).collect{it.toString().padLeft(2, '0')}}
+#        tableStrategy:
+#          standard:
+#            shardingColumn: user_id
+#            shardingAlgorithmName: user-inline
+#      user_tag:
+#        actualDataNodes: badger.user_tag_$->{(0..99).collect{it.toString().padLeft(2, '0')}}
+#        tableStrategy:
+#          standard:
+#            shardingColumn: user_id
+#            shardingAlgorithmName: user_tag-inline
+## ShardingSphere 5.x+推荐使用这种写法
+#    shardingAlgorithms:
+#      user-inline:
+#        type: INLINE
+#        props:
+#          algorithm-expression: user_$->{(user_id % 100).toString().padLeft(2, '0')}
+#      user_tag-inline:
+#        type: INLINE
+#        props:
+#          algorithm-expression: user_tag_$->{(user_id % 100).toString().padLeft(2, '0')}
+#
+#props:
+#  sql-show: true

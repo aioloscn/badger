@@ -3,8 +3,8 @@ package com.aiolos.badger.identitycore.provider.rpc;
 import com.aiolos.badger.common.redis.UserRedisKeyBuilder;
 import com.aiolos.badger.identitycore.api.AccountTokenApi;
 import com.aiolos.badger.identitycore.dto.AccountDTO;
-import com.aiolos.badger.identitycore.provider.utils.AnonymousIdGenerator;
-import com.aiolos.common.utils.ConvertBeanUtil;
+import com.aiolos.badger.identitycore.provider.util.AnonymousIdGenerator;
+import com.aiolos.common.util.ConvertBeanUtil;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +32,7 @@ public class AccountTokenApiImpl implements AccountTokenApi {
     @Override
     public AccountDTO getUserByToken(String token) {
         AccountDTO dto = new AccountDTO();
-        Long userId = null;
+        Long userId;
         Object obj = redisTemplate.opsForValue().get(userRedisKeyBuilder.buildUserTokenKey(token));
         if (obj instanceof Integer) {
             userId = ((Integer) obj).longValue();

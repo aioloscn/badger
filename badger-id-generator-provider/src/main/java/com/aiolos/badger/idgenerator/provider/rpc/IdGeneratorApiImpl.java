@@ -8,7 +8,7 @@ import com.aiolos.badger.idgenerator.provider.bo.LocalNonSeqIdBO;
 import com.aiolos.badger.idgenerator.provider.bo.LocalSeqIdBO;
 import com.aiolos.badger.model.po.IdGenerateConfigPO;
 import com.aiolos.badger.service.IdGenerateConfigService;
-import com.aiolos.common.exception.utils.ExceptionUtil;
+import com.aiolos.common.exception.util.ExceptionUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

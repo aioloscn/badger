@@ -1,0 +1,46 @@
+services:
+  badger-user-provider-docker-1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: 'badger-user-provider-docker:latest'
+    environment:
+      - server.port=9911
+      - spring.cloud.nacos.discovery.ip=${DEV_HOST} # 不同物理机必须明确指定IP
+      - DUBBO_IP_TO_REGISTRY=${DEV_HOST}
+      - DUBBO_PORT_TO_BIND=29911            # 容器内 Dubbo 服务绑定的端口（需与 dubbo.protocol.port 一致）
+      - NACOS_HOST=${DEV_HOST}
+      - REDIS_HOST=${DEV_HOST}
+      - ROCKETMQ_HOST=${DEV_HOST}
+      - JAVA_OPTS=-XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m -Xms512m -Xmx512m -Xmn256m -Xss256k
+    ports:
+      - '9911:9911'
+      - '29911:29911'
+    extra_hosts:
+      - 'master.mysql.com:${DEV_HOST}'
+      - 'slave.mysql.com:${DEV_HOST}'
+    volumes:
+      - D:\tmp\logs\badger-user-provider-1:/tmp/logs/badger-user-provider
+    
+#  badger-user-provider-docker-2:
+#    build:
+#      context: ..
+#      dockerfile: docker/Dockerfile
+#    image: 'badger-user-provider-docker:latest'
+#    environment:
+#      - server.port=9912
+#      - spring.cloud.nacos.discovery.ip=${DEV_HOST}
+#      - DUBBO_IP_TO_REGISTRY=${DEV_HOST}
+#      - DUBBO_PORT_TO_BIND=29912
+#      - NACOS_HOST=${DEV_HOST}
+#      - REDIS_HOST=${DEV_HOST}
+#      - ROCKETMQ_HOST=${DEV_HOST}
+#      - JAVA_OPTS=-XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m -Xms512m -Xmx512m -Xmn256m -Xss256k
+#    ports:
+#      - '9912:9912'
+#      - '29912:29912'
+#    extra_hosts:
+#      - 'master.mysql.com:${DEV_HOST}'
+#      - 'slave.mysql.com:${DEV_HOST}'
+#    volumes:
+#      - D:\tmp\logs\badger-user-provider-2:/tmp/logs/badger-user-provider
