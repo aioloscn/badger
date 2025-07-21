@@ -1,9 +1,9 @@
 services:
-  badger-id-generator-provider-docker-1:
+  badger-id-generator-provider-1:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: 'badger-id-generator-provider-docker:latest'
+    image: 'badger-id-generator-provider:latest'
     environment:
       - spring.cloud.nacos.discovery.ip=${DEV_HOST} # 不同物理机必须明确指定IP
       - DUBBO_IP_TO_REGISTRY=${DEV_HOST}
@@ -16,11 +16,8 @@ services:
     volumes:
       - D:\tmp\logs\badger-id-generator-provider-1:/tmp/logs/badger-id-generator-provider
 
-#  badger-id-generator-provider-docker-2:
-#    build:
-#      context: ..
-#      dockerfile: docker/Dockerfile
-#    image: 'badger-id-generator-provider-docker:latest'
+#  badger-id-generator-provider-2:
+#    image: 'badger-id-generator-provider:latest'
 #    environment:
 #      - spring.cloud.nacos.discovery.ip=${DEV_HOST} # 不同物理机必须明确指定IP
 #      - DUBBO_IP_TO_REGISTRY=${DEV_HOST}

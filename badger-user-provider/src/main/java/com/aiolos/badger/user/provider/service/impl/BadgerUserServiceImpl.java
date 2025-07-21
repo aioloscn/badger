@@ -69,6 +69,8 @@ public class BadgerUserServiceImpl implements BadgerUserService {
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
+    @Value("${cookie-domain}")
+    private String cookieDomain;
 
     @Transactional
     @Override
@@ -114,11 +116,11 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(loginBO.getPhone()));
 
         String token = accountTokenApi.createToken(userVO.getUserId());
-        ResponseCookie cookie = ResponseCookie.from("live-token", token)
+        ResponseCookie cookie = ResponseCookie.from("vs-token", token)
                 .maxAge(Duration.ofDays(30))
                 .httpOnly(true)
                 .secure(activeProfile.equalsIgnoreCase("prod")) // 仅https传输
-                .domain("live.aiolos.com")
+                .domain(cookieDomain)
                 .path("/")
                 .build();
         response.setHeader("Access-Control-Allow-Credentials", "true");

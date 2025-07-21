@@ -18,6 +18,8 @@
     <module>badger-identity-core-provider</module>
     <module>badger-user-api</module>
     <module>badger-user-provider</module>
+    <module>badger-sms-api</module>
+    <module>badger-sms-provider</module>
   </modules>
 
   <properties>
@@ -36,6 +38,8 @@
     <badger-identity-core-provider.version>1.0-SNAPSHOT</badger-identity-core-provider.version>
     <badger-user-api.version>1.0-SNAPSHOT</badger-user-api.version>
     <badger-user-provider.version>1.0-SNAPSHOT</badger-user-provider.version>
+    <badger-sms-api.version>1.0-SNAPSHOT</badger-sms-api.version>
+    <badger-sms-provider.version>1.0-SNAPSHOT</badger-sms-provider.version>
   </properties>
 
   <parent>
@@ -78,18 +82,8 @@
       </dependency>
       <dependency>
         <groupId>com.aiolos</groupId>
-        <artifactId>badger-id-generator-provider</artifactId>
-        <version>${badger-id-generator-provider.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.aiolos</groupId>
         <artifactId>badger-identity-core-api</artifactId>
         <version>${badger-identity-core-api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.aiolos</groupId>
-        <artifactId>badger-identity-core-provider</artifactId>
-        <version>${badger-identity-core-provider.version}</version>
       </dependency>
       <dependency>
         <groupId>com.aiolos</groupId>
@@ -98,9 +92,27 @@
       </dependency>
       <dependency>
         <groupId>com.aiolos</groupId>
-        <artifactId>badger-user-provider</artifactId>
-        <version>${badger-user-provider.version}</version>
+        <artifactId>badger-sms-api</artifactId>
+        <version>${badger-sms-api.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

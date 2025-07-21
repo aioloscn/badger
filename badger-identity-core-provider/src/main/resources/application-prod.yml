@@ -1,0 +1,20 @@
+config:
+  nacos:
+    host: ${NACOS_HOST:127.0.0.1}:8848
+    
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: ${config.nacos.host}
+        namespace: public
+      config:
+        file-extension: yaml
+        server-addr: ${config.nacos.host}
+        namespace: public
+        group: DEFAULT_GROUP
+  config:
+    import: 
+      - optional:nacos:badger-identity-core-provider-config.yaml

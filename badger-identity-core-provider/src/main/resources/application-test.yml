@@ -24,4 +24,4 @@
 #    name: dubbo-badger-identity-core-provider
 #    qos-enable: false
 #  registry:
-#    address: nacos://${config.nacos.host}?namespace=live-test&username=nacos&password=nacos
+#    address: nacos://${config.nacos.host}?namespace=dev&username=nacos&password=nacos

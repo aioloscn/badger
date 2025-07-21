@@ -54,7 +54,7 @@ public class User implements Serializable {
      * 性别 0男, 1女
      */
     @TableField("sex")
-    private Byte sex;
+    private Integer sex;
 
     /**
      * 手机号
@@ -63,48 +63,44 @@ public class User implements Serializable {
     private String phone;
 
     /**
+     * 邮箱
+     */
+    @TableField("email")
+    private String email;
+
+    /**
+     * 省份
+     */
+    @TableField("province")
+    private String province;
+    
+    /**
+     * 城市
+     */
+    @TableField("city")
+    private String city;
+
+    /**
+     * 区县
+     */
+    @TableField("district")
+    private String district;
+
+    /**
+     * 用户状态：0：未激活。 1：已激活：基本信息是否完善，真实姓名，邮箱地址，性别，生日，住址等，如果没有完善，则用户不能在作家中心操作，不能关注。2：已冻结
+     */
+    @TableField("active_status")
+    private Integer activeStatus;
+
+    /**
      * 出生时间
      */
     @TableField("born_time")
     private LocalDateTime bornTime;
-
-    /**
-     * 工作地
-     */
-    @TableField("work_city")
-    private Integer workCity;
-
-    /**
-     * 出生地
-     */
-    @TableField("born_city")
-    private Integer bornCity;
 
     @TableField("create_time")
     private LocalDateTime createTime;
 
     @TableField("update_time")
     private LocalDateTime updateTime;
-
-    public static final String USER_ID = "user_id";
-
-    public static final String NICK_NAME = "nick_name";
-
-    public static final String AVATAR = "avatar";
-
-    public static final String TRUE_NAME = "true_name";
-
-    public static final String SEX = "sex";
-    
-    public static final String PHONE = "phone";
-
-    public static final String BORN_TIME = "born_time";
-
-    public static final String WORK_CITY = "work_city";
-
-    public static final String BORN_CITY = "born_city";
-
-    public static final String CREATE_TIME = "create_time";
-
-    public static final String UPDATE_TIME = "update_time";
 }

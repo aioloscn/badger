@@ -1,9 +1,9 @@
 services:
-  badger-user-provider-docker-1:
+  badger-user-provider-1:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: 'badger-user-provider-docker:latest'
+    image: 'badger-user-provider:latest'
     environment:
       - server.port=9911
       - spring.cloud.nacos.discovery.ip=${DEV_HOST} # 不同物理机必须明确指定IP
@@ -22,11 +22,8 @@ services:
     volumes:
       - D:\tmp\logs\badger-user-provider-1:/tmp/logs/badger-user-provider
     
-#  badger-user-provider-docker-2:
-#    build:
-#      context: ..
-#      dockerfile: docker/Dockerfile
-#    image: 'badger-user-provider-docker:latest'
+#  badger-user-provider-2:
+#    image: 'badger-user-provider:latest'
 #    environment:
 #      - server.port=9912
 #      - spring.cloud.nacos.discovery.ip=${DEV_HOST}

@@ -1,0 +1,32 @@
+config:
+  nacos:
+    host: ${NACOS_HOST:127.0.0.1}:18848
+
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: ${config.nacos.host}
+        namespace: dev
+      config:
+        file-extension: yaml
+        server-addr: ${config.nacos.host}
+        namespace: dev
+        group: DEFAULT_GROUP
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/badger?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    
+dubbo:
+  protocol:
+    name: dubbo
+    port: 29951
+  application:
+    name: dubbo-badger-sms-provider
+    qos-enable: false
+  registry:
+    address: nacos://${config.nacos.host}?namespace=dev&username=nacos&password=nacos

@@ -24,7 +24,7 @@
 #          enable-msg-trace: true
 #  datasource:
 #    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
-#    url: jdbc:shardingsphere:nacos:${config.nacos.host}:badger-user-provider-sharding-jdbc.yaml?username=nacos&password=nacos&namespace=live-test&group=DEFAULT_GROUP
+#    url: jdbc:shardingsphere:nacos:${config.nacos.host}:badger-user-provider-sharding-jdbc.yaml?username=nacos&password=nacos&namespace=dev&group=DEFAULT_GROUP
 #    hikari:
 #      pool-name: db-user
 #      idle-timeout: 300000
@@ -54,7 +54,7 @@
 #    name: dubbo-badger-user-provider
 #    qos-enable: false
 #  registry:
-#    address: nacos://${config.nacos.host}?namespace=live-test&username=nacos&password=nacos
+#    address: nacos://${config.nacos.host}?namespace=dev&username=nacos&password=nacos
 #  consumer:
 #    retries: 2    # 默认2
 #    timeout: 5000 # 全局默认超时，控制消费者调用服务时的等待时间

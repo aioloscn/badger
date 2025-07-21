@@ -21,7 +21,7 @@ public class NacosDriverURLProvider implements ShardingSphereDriverURLProvider {
     }
 
     /**
-     * @param url jdbc:shardingsphere:nacos:127.0.0.1:8848:badger-user-provider-sharding-jdbc.yaml?username=nacos&password=nacos&namespace=live-test&group=DEFAULT_GROUP
+     * @param url jdbc:shardingsphere:nacos:127.0.0.1:8848:badger-user-provider-sharding-jdbc.yaml?username=nacos&password=nacos&namespace=dev&group=DEFAULT_GROUP
      * @return
      */
     @Override

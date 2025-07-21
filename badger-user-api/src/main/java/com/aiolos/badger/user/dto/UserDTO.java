@@ -28,13 +28,4 @@ public class UserDTO implements Serializable {
 
     @Schema(description = "出生时间")
     private LocalDateTime bornTime;
-
-    @Schema(description = "工作地")
-    private Integer workCity;
-
-    @Schema(description = "出生地")
-    private Integer bornCity;
-
-    private LocalDateTime createTime;
-
 }
