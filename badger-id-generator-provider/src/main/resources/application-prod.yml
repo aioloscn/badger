@@ -1,15 +1,17 @@
 config:
   nacos:
     host: ${NACOS_HOST:127.0.0.1}:18848
+    username: nacos
+    password: nacos
 
 spring:
   cloud:
     nacos:
-      username: nacos
-      password: nacos
+      username: ${config.nacos.username}
+      password: ${config.nacos.password}
       discovery:
         server-addr: ${config.nacos.host}
-        namespace: dev
+        namespace: public
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/badger?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
@@ -24,4 +26,4 @@ dubbo:
     name: dubbo-badger-id-generator-provider
     qos-enable: false
   registry:
-    address: nacos://${config.nacos.host}?namespace=dev&username=nacos&password=nacos
+    address: nacos://${config.nacos.host}?namespace=public&username=${config.nacos.username}&password=${config.nacos.password}

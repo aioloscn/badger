@@ -9,11 +9,11 @@ spring:
       password: nacos
       discovery:
         server-addr: ${config.nacos.host}
-        namespace: dev
+        namespace: public
       config:
         file-extension: yaml  # 当前服务启动后去nacos配置中心下获取配置文件的后缀
         server-addr: ${config.nacos.host}
-        namespace: dev
+        namespace: public
         group: DEFAULT_GROUP
   config:
     import:

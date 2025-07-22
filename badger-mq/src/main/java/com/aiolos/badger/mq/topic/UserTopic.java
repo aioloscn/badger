@@ -1,8 +1,8 @@
 package com.aiolos.badger.mq.topic;
 
-public final class UserRocketMQTopic {
+public final class UserTopic {
     
-    private UserRocketMQTopic() {}
+    private UserTopic() {}
     
     public static final String CACHE_ASYNC_DELETE = "cacheAsyncDelete-out-0";
 }

@@ -5,6 +5,7 @@ services:
       dockerfile: docker/Dockerfile
     image: 'badger-sms-provider:latest'
     environment:
+      - server.port=9951
       - spring.cloud.nacos.discovery.ip=${DEV_HOST} # 不同物理机必须明确指定IP
       - DUBBO_IP_TO_REGISTRY=${DEV_HOST}
       - DUBBO_PORT_TO_BIND=29951            # 容器内 Dubbo 服务绑定的端口（会覆盖 dubbo.protocol.port）
@@ -14,6 +15,7 @@ services:
       - REDIS_HOST=${DEV_HOST}
       - JAVA_OPTS=-XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xms256m -Xmx256m -Xmn128m -Xss256k
     ports:
+      - '9951:9951'
       - '29951:29951'
     volumes:
       - D:\tmp\logs\badger-sms-provider-1:/tmp/logs/badger-sms-provider

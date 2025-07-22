@@ -2,7 +2,7 @@ package com.aiolos.badger.user.provider.mq.producer;
 
 import com.aiolos.badger.enums.UserCacheEnum;
 import com.aiolos.badger.mq.message.UserCacheMessage;
-import com.aiolos.badger.mq.topic.UserRocketMQTopic;
+import com.aiolos.badger.mq.topic.UserTopic;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageConst;
@@ -21,7 +21,7 @@ public class UpdateUserInfoProducer {
         UserCacheMessage message = new UserCacheMessage();
         message.setUserId(userId);
         message.setUserCacheEnum(UserCacheEnum.USER_INFO_CACHE);
-        boolean sent = streamBridge.send(UserRocketMQTopic.CACHE_ASYNC_DELETE, 
+        boolean sent = streamBridge.send(UserTopic.CACHE_ASYNC_DELETE, 
                 MessageBuilder.withPayload(message).setHeader(MessageConst.PROPERTY_DELAY_TIME_LEVEL, 1).build());
         if (sent)
             log.info("已发送删除用户{}缓存的延迟消息", userId);
@@ -33,7 +33,7 @@ public class UpdateUserInfoProducer {
         UserCacheMessage message = new UserCacheMessage();
         message.setUserId(userId);
         message.setUserCacheEnum(UserCacheEnum.USER_TAG_CACHE);
-        boolean sent = streamBridge.send(UserRocketMQTopic.CACHE_ASYNC_DELETE,
+        boolean sent = streamBridge.send(UserTopic.CACHE_ASYNC_DELETE,
                 MessageBuilder.withPayload(message).setHeader(MessageConst.PROPERTY_DELAY_TIME_LEVEL, 1).build());
         if (sent)
             log.info("已发送删除用户{}tag缓存的延迟消息", userId);
