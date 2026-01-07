@@ -25,6 +25,11 @@ public class UserController {
         return badgerUserService.login(loginBO, response);
     }
 
+    @PostMapping("/logout")
+    public void logout(HttpServletResponse response) {
+        badgerUserService.logout(response);
+    }
+
     @GetMapping("/get-user-by-id")
     public UserVO getUserById(Long userId) {
         return badgerUserService.getUserById(userId);

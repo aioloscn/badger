@@ -12,6 +12,8 @@ public interface BadgerUserService {
 
     UserVO login(LoginBO loginBO, HttpServletResponse response);
 
+    void logout(HttpServletResponse response);
+
     UserVO getUserById(Long userId);
 
     void insertUser(UserDTO userDTO);

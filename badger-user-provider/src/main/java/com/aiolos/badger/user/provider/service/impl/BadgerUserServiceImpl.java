@@ -8,6 +8,7 @@ import com.aiolos.badger.model.po.UserPhoneMapping;
 import com.aiolos.badger.service.UserPhoneMappingService;
 import com.aiolos.common.enums.error.ErrorEnum;
 import com.aiolos.common.exception.util.ExceptionUtil;
+import com.aiolos.common.model.ContextInfo;
 import com.aiolos.common.redis.builder.CommonSmsRedisKeyBuilder;
 import com.aiolos.common.redis.builder.CommonUserRedisKeyBuilder;
 import com.aiolos.common.util.ConvertBeanUtil;
@@ -34,10 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
@@ -126,6 +124,27 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Set-Cookie", cookie.toString());
         return userVO;
+    }
+
+    @Override
+    public void logout(HttpServletResponse response) {
+        Long userId = ContextInfo.getUserId();
+        if (userId == null) return;
+        String key = userRedisKeyBuilder.buildUserInfoKey(userId);
+        Object obj = redisTemplate.opsForValue().get(key);
+        if (obj != null) {
+            
+            String token = (String) obj;
+            ResponseCookie cookie = ResponseCookie.from("vs-token", token)
+                    .maxAge(0)
+                    .httpOnly(true)
+                    .secure(activeProfile.equalsIgnoreCase("prod"))
+                    .domain(cookieDomain)
+                    .path("/")
+                    .build();
+            response.setHeader("Set-Cookie", cookie.toString());
+            redisTemplate.delete(Arrays.asList(key, userRedisKeyBuilder.buildUserTokenKey(token)));
+        }
     }
 
     @Override

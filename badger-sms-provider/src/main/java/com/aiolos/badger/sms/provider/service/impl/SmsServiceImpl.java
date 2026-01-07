@@ -37,7 +37,7 @@ public class SmsServiceImpl implements SmsService {
             return CommonResponse.error(MsgSendResultEnum.PARAM_ERROR.getCode(), MsgSendResultEnum.PARAM_ERROR.getDesc());
         }
 
-        if (!redisTemplate.opsForValue().setIfAbsent(smsRedisKeyBuilder.buildPreventRepeatSendingKey(phone), 1, 60, TimeUnit.SECONDS)) {
+        if (Boolean.FALSE.equals(redisTemplate.opsForValue().setIfAbsent(smsRedisKeyBuilder.buildPreventRepeatSendingKey(phone), 1, 60, TimeUnit.SECONDS))) {
             ExceptionUtil.throwException(ErrorEnum.REPEAT_SENDING_SMS_CODE);
         }
 

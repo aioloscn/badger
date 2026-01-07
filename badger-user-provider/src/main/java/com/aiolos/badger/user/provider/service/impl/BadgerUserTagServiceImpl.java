@@ -133,6 +133,7 @@ public class BadgerUserTagServiceImpl implements BadgerUserTagService {
         if (userTag == null || userTag.getUserId() == null || userTagEnum.getTag() <= 0)
             return false;
         
+        // 可以改为 (a & b) != 0，尤其是判断多身份时必须使用这种方式
         if (userTagEnum.getFieldName().equals(UserTagFieldNameConstants.TAG_INFO_01) && userTag.getTagInfo01() > 0) {
             return (userTag.getTagInfo01() & userTagEnum.getTag()) == userTagEnum.getTag();
         } else if (userTagEnum.getFieldName().equals(UserTagFieldNameConstants.TAG_INFO_02) && userTag.getTagInfo02() > 0) {
