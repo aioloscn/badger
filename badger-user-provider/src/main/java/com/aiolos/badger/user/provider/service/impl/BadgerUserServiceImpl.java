@@ -114,14 +114,34 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(loginBO.getPhone()));
 
         String token = accountTokenApi.createToken(userVO.getUserId());
-        ResponseCookie cookie = ResponseCookie.from("vs-token", token)
+        /*ResponseCookie cookie = ResponseCookie.from("vs-token", token)
                 .maxAge(Duration.ofDays(30))
                 .httpOnly(true)
                 .secure(activeProfile.equalsIgnoreCase("prod")) // 仅https传输
                 .domain(cookieDomain)
                 .path("/")
                 .build();
+        response.setHeader("Access-Control-Allow-Credentials", "true");*/
+
+        // 构建 Cookie
+        ResponseCookie cookie = ResponseCookie.from("vs-token", token)
+                .maxAge(Duration.ofDays(30))
+                .httpOnly(true)
+                // 【修改点 1】本地 HTTP 调试必须设为 false，否则浏览器不认
+                .secure(false)
+                .domain(cookieDomain)
+                .path("/")
+                // 【修改点 2】同父域（.aiolos.com）下用 Lax 即可，不要用 None
+                .sameSite("Lax")
+                .build();
+
+        // 关键修改 3：确保 CORS 配置正确
+        // 允许前端携带凭证（你原本代码里有）
         response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        // 补充：Access-Control-Allow-Origin 不能为 *，必须是具体的前端域名
+        // 如果你的全局 CORS 配置没处理这个，建议加上下面这行：
+        // response.setHeader("Access-Control-Allow-Origin", "http://localhost:5500"); // 或者动态获取 request.getHeader("Origin")
         response.setHeader("Set-Cookie", cookie.toString());
         return userVO;
     }
