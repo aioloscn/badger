@@ -8,7 +8,6 @@ import com.aiolos.badger.model.po.UserPhoneMapping;
 import com.aiolos.badger.service.UserPhoneMappingService;
 import com.aiolos.common.enums.error.ErrorEnum;
 import com.aiolos.common.exception.util.ExceptionUtil;
-import com.aiolos.common.model.ContextInfo;
 import com.aiolos.common.redis.builder.CommonSmsRedisKeyBuilder;
 import com.aiolos.common.redis.builder.CommonUserRedisKeyBuilder;
 import com.aiolos.common.util.ConvertBeanUtil;
@@ -21,6 +20,8 @@ import com.aiolos.badger.user.provider.mq.producer.UpdateUserInfoProducer;
 import com.aiolos.badger.user.provider.service.BadgerUserService;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -65,8 +66,6 @@ public class BadgerUserServiceImpl implements BadgerUserService {
     @DubboReference
     private AccountTokenApi accountTokenApi;
 
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
     @Value("${cookie-domain}")
     private String cookieDomain;
 
@@ -147,30 +146,58 @@ public class BadgerUserServiceImpl implements BadgerUserService {
     }
 
     @Override
-    public void logout(HttpServletResponse response) {
-        Long userId = ContextInfo.getUserId();
-        if (userId == null) return;
-        String key = userRedisKeyBuilder.buildUserInfoKey(userId);
-        Object obj = redisTemplate.opsForValue().get(key);
-        if (obj != null) {
-            
-            String token = (String) obj;
-            ResponseCookie cookie = ResponseCookie.from("vs-token", token)
-                    .maxAge(0)
-                    .httpOnly(true)
-                    .secure(activeProfile.equalsIgnoreCase("prod"))
-                    .domain(cookieDomain)
-                    .path("/")
-                    .build();
-            response.setHeader("Set-Cookie", cookie.toString());
-            redisTemplate.delete(Arrays.asList(key, userRedisKeyBuilder.buildUserTokenKey(token)));
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String token = getCookieValue(request, "vs-token");
+        ResponseCookie cookie = ResponseCookie.from("vs-token", "")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(false)
+                .domain(cookieDomain)
+                .path("/")
+                .sameSite("Lax")
+                .build();
+        response.setHeader("Set-Cookie", cookie.toString());
+
+        if (StringUtils.isBlank(token)) {
+            return;
         }
+
+        String tokenKey = userRedisKeyBuilder.buildUserTokenKey(token);
+        Long userId = getUserIdByTokenKey(tokenKey);
+        if (userId == null) {
+            redisTemplate.delete(tokenKey);
+            return;
+        }
+        redisTemplate.delete(Arrays.asList(tokenKey, commonUserRedisKeyBuilder.buildUserInfoKey(userId)));
+    }
+
+    private Long getUserIdByTokenKey(String tokenKey) {
+        Object obj = redisTemplate.opsForValue().get(tokenKey);
+        if (obj instanceof Integer) {
+            return ((Integer) obj).longValue();
+        }
+        if (obj instanceof Long) {
+            return (Long) obj;
+        }
+        return null;
+    }
+
+    private String getCookieValue(HttpServletRequest request, String cookieName) {
+        if (request == null || request.getCookies() == null) {
+            return null;
+        }
+        for (Cookie cookie : request.getCookies()) {
+            if (cookieName.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 
     @Override
     public UserVO getUserById(Long userId) {
         if (userId == null || userId <= 0) {
-            return null;
+            return new UserVO();
         }
         
         String userKey = commonUserRedisKeyBuilder.buildUserInfoKey(userId);

@@ -3,6 +3,7 @@ package com.aiolos.badger.user.provider.service;
 import com.aiolos.badger.user.dto.UserDTO;
 import com.aiolos.badger.user.provider.model.bo.LoginBO;
 import com.aiolos.badger.user.provider.model.vo.UserVO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface BadgerUserService {
 
     UserVO login(LoginBO loginBO, HttpServletResponse response);
 
-    void logout(HttpServletResponse response);
+    void logout(HttpServletRequest request, HttpServletResponse response);
 
     UserVO getUserById(Long userId);
 

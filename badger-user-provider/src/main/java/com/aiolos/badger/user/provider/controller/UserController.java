@@ -4,7 +4,9 @@ import com.aiolos.badger.user.dto.UserDTO;
 import com.aiolos.badger.user.provider.model.bo.LoginBO;
 import com.aiolos.badger.user.provider.model.vo.UserVO;
 import com.aiolos.badger.user.provider.service.BadgerUserService;
+import com.aiolos.common.model.ContextInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +28,18 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public void logout(HttpServletResponse response) {
-        badgerUserService.logout(response);
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        badgerUserService.logout(request, response);
     }
 
     @GetMapping("/get-user-by-id")
     public UserVO getUserById(Long userId) {
         return badgerUserService.getUserById(userId);
+    }
+    
+    @GetMapping("query-user")
+    public UserVO queryUser() {
+        return getUserById(ContextInfo.getUserId());
     }
 
     @PostMapping("/insert-user")
