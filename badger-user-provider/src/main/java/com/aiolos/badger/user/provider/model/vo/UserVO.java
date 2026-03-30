@@ -1,5 +1,6 @@
 package com.aiolos.badger.user.provider.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -25,6 +26,10 @@ public class UserVO {
     @Schema(description = "手机号")
     private String phone;
 
+    @Schema(description = "密码", hidden = true)
+    @JsonIgnore
+    private String password;
+
     @Schema(description = "邮箱")
     private String email;
 
@@ -42,4 +47,10 @@ public class UserVO {
 
     @Schema(description = "出生时间")
     private LocalDateTime bornTime;
+
+    @Schema(description = "登录Token(JWT)")
+    private String token;
+
+    @Schema(description = "刷新Token(用于无感刷新)")
+    private String refreshToken;
 }

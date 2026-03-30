@@ -26,6 +26,8 @@
     <mysql.version>8.0.28</mysql.version>
     <mybatis-plus.version>3.5.5</mybatis-plus.version>
     <sharding.jdbc.version>5.3.2</sharding.jdbc.version>
+    <jjwt.version>0.11.5</jjwt.version>
+    <spring-authorization-server.version>1.0.1</spring-authorization-server.version>
 
     <badger-common.version>1.0-SNAPSHOT</badger-common.version>
     <badger-enums.version>1.0-SNAPSHOT</badger-enums.version>
@@ -94,6 +96,34 @@
         <groupId>com.aiolos</groupId>
         <artifactId>badger-sms-api</artifactId>
         <version>${badger-sms-api.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      
+      <!-- Spring Authorization Server -->
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-oauth2-authorization-server</artifactId>
+        <version>${spring-authorization-server.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+        <version>3.0.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

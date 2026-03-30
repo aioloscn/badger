@@ -16,6 +16,10 @@
         </dependency>
         <dependency>
             <groupId>com.aiolos</groupId>
+            <artifactId>common-cloud</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aiolos</groupId>
             <artifactId>common-dubbo</artifactId>
         </dependency>
         <dependency>

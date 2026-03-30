@@ -68,6 +68,9 @@ public class User implements Serializable {
     @TableField("email")
     private String email;
 
+    @TableField("password")
+    private String password;
+
     /**
      * 省份
      */

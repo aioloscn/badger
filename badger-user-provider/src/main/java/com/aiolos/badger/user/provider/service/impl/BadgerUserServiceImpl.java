@@ -2,6 +2,7 @@ package com.aiolos.badger.user.provider.service.impl;
 
 import com.aiolos.badger.common.redis.UserRedisKeyBuilder;
 import com.aiolos.badger.identitycore.api.AccountTokenApi;
+import com.aiolos.badger.identitycore.dto.AccountTokenDTO;
 import com.aiolos.badger.idgenerator.api.IdGeneratorApi;
 import com.aiolos.badger.idgenerator.enums.IdPolicyEnum;
 import com.aiolos.badger.model.po.UserPhoneMapping;
@@ -31,6 +32,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -46,6 +50,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class BadgerUserServiceImpl implements BadgerUserService {
+
+    private static final BCryptPasswordEncoder BCRYPT_PASSWORD_ENCODER = new BCryptPasswordEncoder();
+    private static final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -72,91 +79,76 @@ public class BadgerUserServiceImpl implements BadgerUserService {
     @Transactional
     @Override
     public UserVO login(LoginBO loginBO, HttpServletResponse response) {
-        
-        if (StringUtils.isBlank(loginBO.getCode()) || StringUtils.isBlank(loginBO.getCode())) {
+        if (loginBO == null || StringUtils.isBlank(loginBO.getPhone())) {
+            ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR);
+        }
+        boolean useSmsLogin = StringUtils.isNotBlank(loginBO.getCode());
+        boolean usePasswordLogin = StringUtils.isNotBlank(loginBO.getPassword());
+        if (useSmsLogin == usePasswordLogin) {
             ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR);
         }
 
-        String smsRedisKey = commonSmsRedisKeyBuilder.buildSmsLoginCodeKey(loginBO.getPhone());
-        Object redisVal = redisTemplate.opsForValue().get(smsRedisKey);
-        if (redisVal == null) {
-            ExceptionUtil.throwException(ErrorEnum.SMS_CODE_EXPIRED);
-        }
-
-        String cacheCode = redisVal.toString();
-        if (!cacheCode.equals(loginBO.getCode())) {
-            ExceptionUtil.throwException(ErrorEnum.SMS_CODE_INCORRECT);
-        }
-
-        // 未注册则注册
-        UserVO userVO = this.queryByPhone(loginBO.getPhone());
-        if (userVO == null) {
-            User newUser = new User();
-            // 即便获取不到分布式id，mybatis-plus的@TableId("user_id")会隐式创建一个Long类型id，type=IdType.NONE也一样
-            // 如果ShardingSphere有配置keyGenerateStrategy也会自动生成主键，可以设置雪花算法
-            newUser.setUserId(idGeneratorApi.getNonSeqId(IdPolicyEnum.USER_ID_POLICY.getPrimaryKey()));
-            newUser.setNickName("用户_" + RandomUtils.secure().randomInt(10000000, 99999999));
-            newUser.setPhone(loginBO.getPhone());
-            userVO = ConvertBeanUtil.convert(newUser, UserVO.class);
-
-            if (userService.save(newUser)) {
-                UserPhoneMapping mapping = new UserPhoneMapping();
-                mapping.setUserId(newUser.getUserId());
-                mapping.setPhone(loginBO.getPhone());
-                userPhoneMappingService.save(mapping);
+        UserVO userVO;
+        if (useSmsLogin) {
+            String smsRedisKey = commonSmsRedisKeyBuilder.buildSmsLoginCodeKey(loginBO.getPhone());
+            Object redisVal = redisTemplate.opsForValue().get(smsRedisKey);
+            if (redisVal == null) {
+                ExceptionUtil.throwException(ErrorEnum.SMS_CODE_EXPIRED);
             }
+            if (!redisVal.toString().equals(loginBO.getCode())) {
+                ExceptionUtil.throwException(ErrorEnum.SMS_CODE_INCORRECT);
+            }
+
+            userVO = this.queryByPhone(loginBO.getPhone());
+            if (userVO == null) {
+                User newUser = new User();
+                newUser.setUserId(idGeneratorApi.getNonSeqId(IdPolicyEnum.USER_ID_POLICY.getPrimaryKey()));
+                newUser.setNickName("用户_" + RandomUtils.secure().randomInt(10000000, 99999999));
+                newUser.setPhone(loginBO.getPhone());
+                userVO = ConvertBeanUtil.convert(newUser, UserVO.class);
+
+                if (userService.save(newUser)) {
+                    UserPhoneMapping mapping = new UserPhoneMapping();
+                    mapping.setUserId(newUser.getUserId());
+                    mapping.setPhone(loginBO.getPhone());
+                    userPhoneMappingService.save(mapping);
+                }
+            }
+
+            redisTemplate.delete(smsRedisKey);
+            redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(loginBO.getPhone()));
+        } else {
+            User user = getUserByPhoneFromDb(loginBO.getPhone());
+            if (user == null || user.getUserId() == null) {
+                ExceptionUtil.throwException(ErrorEnum.USER_DOES_NOT_EXIST);
+            }
+            if (StringUtils.isBlank(user.getPassword()) || !PASSWORD_ENCODER.matches(loginBO.getPassword(), user.getPassword())) {
+                ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR);
+            }
+            userVO = ConvertBeanUtil.convert(user, UserVO.class);
+            redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(loginBO.getPhone()));
         }
 
+        userVO.setPassword(null);
         redisTemplate.opsForValue().set(commonUserRedisKeyBuilder.buildUserInfoKey(userVO.getUserId()), userVO, 7, TimeUnit.DAYS);
-
-        redisTemplate.delete(smsRedisKey);
-        redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(loginBO.getPhone()));
-
-        String token = accountTokenApi.createToken(userVO.getUserId());
-        /*ResponseCookie cookie = ResponseCookie.from("vs-token", token)
-                .maxAge(Duration.ofDays(30))
-                .httpOnly(true)
-                .secure(activeProfile.equalsIgnoreCase("prod")) // 仅https传输
-                .domain(cookieDomain)
-                .path("/")
-                .build();
-        response.setHeader("Access-Control-Allow-Credentials", "true");*/
-
-        // 构建 Cookie
-        ResponseCookie cookie = ResponseCookie.from("vs-token", token)
-                .maxAge(Duration.ofDays(30))
-                .httpOnly(true)
-                // 【修改点 1】本地 HTTP 调试必须设为 false，否则浏览器不认
-                .secure(false)
-                .domain(cookieDomain)
-                .path("/")
-                // 【修改点 2】同父域（.aiolos.com）下用 Lax 即可，不要用 None
-                .sameSite("Lax")
-                .build();
-
-        // 关键修改 3：确保 CORS 配置正确
-        // 允许前端携带凭证（你原本代码里有）
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-
-        // 补充：Access-Control-Allow-Origin 不能为 *，必须是具体的前端域名
-        // 如果你的全局 CORS 配置没处理这个，建议加上下面这行：
-        // response.setHeader("Access-Control-Allow-Origin", "http://localhost:5500"); // 或者动态获取 request.getHeader("Origin")
-        response.setHeader("Set-Cookie", cookie.toString());
+        AccountTokenDTO tokenDTO = accountTokenApi.createToken(userVO.getUserId());
+        userVO.setToken(tokenDTO.getAccessToken());
+        userVO.setRefreshToken(tokenDTO.getRefreshToken());
         return userVO;
     }
 
     @Override
+    public AccountTokenDTO refreshToken(String refreshToken) {
+        return accountTokenApi.refreshToken(refreshToken);
+    }
+
+    @Override
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        String token = getCookieValue(request, "vs-token");
-        ResponseCookie cookie = ResponseCookie.from("vs-token", "")
-                .maxAge(0)
-                .httpOnly(true)
-                .secure(false)
-                .domain(cookieDomain)
-                .path("/")
-                .sameSite("Lax")
-                .build();
-        response.setHeader("Set-Cookie", cookie.toString());
+        // 直接从 Header 获取 Token
+        String token = request.getHeader("Authorization");
+        if (StringUtils.isNotBlank(token) && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
 
         if (StringUtils.isBlank(token)) {
             return;
@@ -238,6 +230,43 @@ public class BadgerUserServiceImpl implements BadgerUserService {
     }
 
     @Override
+    public void changePasswordBySms(Long userId, String code, String newPassword) {
+        if (userId == null || userId <= 0 || StringUtils.isBlank(code) || StringUtils.isBlank(newPassword)) {
+            ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR);
+        }
+        if (newPassword.length() < 8) {
+            ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR);
+        }
+
+        User user = userService.getById(userId);
+        if (user == null || StringUtils.isBlank(user.getPhone())) {
+            ExceptionUtil.throwException(ErrorEnum.USER_DOES_NOT_EXIST);
+        }
+
+        String smsRedisKey = commonSmsRedisKeyBuilder.buildSmsLoginCodeKey(user.getPhone());
+        Object redisVal = redisTemplate.opsForValue().get(smsRedisKey);
+        if (redisVal == null) {
+            ExceptionUtil.throwException(ErrorEnum.SMS_CODE_EXPIRED);
+        }
+        if (!code.equals(redisVal.toString())) {
+            ExceptionUtil.throwException(ErrorEnum.SMS_CODE_INCORRECT);
+        }
+
+        String encodedPassword = "{bcrypt}" + BCRYPT_PASSWORD_ENCODER.encode(newPassword);
+        boolean updated = userService.lambdaUpdate()
+                .set(User::getPassword, encodedPassword)
+                .eq(User::getUserId, userId)
+                .update();
+        if (!updated) {
+            ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR);
+        }
+
+        redisTemplate.delete(smsRedisKey);
+        redisTemplate.delete(commonUserRedisKeyBuilder.buildUserInfoKey(userId));
+        redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(user.getPhone()));
+    }
+
+    @Override
     public Map<Long, UserVO> batchQueryUserInfo(List<Long> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return Maps.newHashMap();
@@ -302,6 +331,18 @@ public class BadgerUserServiceImpl implements BadgerUserService {
             if (userVO.getUserId() == null) {
                 return null;
             }
+            if (StringUtils.isNotBlank(userVO.getPassword())) {
+                return userVO;
+            }
+            UserPhoneMapping mapping = userPhoneMappingService.lambdaQuery().eq(UserPhoneMapping::getPhone, phone).one();
+            if (mapping != null) {
+                User user = userService.lambdaQuery().eq(User::getUserId, mapping.getUserId()).one();
+                if (user != null) {
+                    UserVO dbUserVO = ConvertBeanUtil.convert(user, UserVO.class);
+                    redisTemplate.opsForValue().set(key, dbUserVO, 30, TimeUnit.MINUTES);
+                    return dbUserVO;
+                }
+            }
             return userVO;
         }
 
@@ -318,5 +359,17 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         // 防止缓存穿透，设置空缓存
         redisTemplate.opsForValue().set(key, new UserVO(), 60, TimeUnit.SECONDS);
         return null;
+    }
+
+    @Override
+    public User getUserByPhoneFromDb(String phone) {
+        if (StringUtils.isBlank(phone)) {
+            return null;
+        }
+        UserPhoneMapping mapping = userPhoneMappingService.lambdaQuery().eq(UserPhoneMapping::getPhone, phone).one();
+        if (mapping == null) {
+            return null;
+        }
+        return userService.lambdaQuery().eq(User::getUserId, mapping.getUserId()).one();
     }
 }

@@ -1,6 +1,7 @@
 package com.aiolos.badger.sms.provider.controller;
 
 import com.aiolos.badger.sms.provider.service.SmsService;
+import com.aiolos.common.cloud.annotation.IgnoreAuth;
 import com.aiolos.common.model.response.CommonResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -17,6 +18,7 @@ public class SmsController {
     private SmsService smsService;
 
     @PostMapping("/send-sms")
+    @IgnoreAuth
     CommonResponse sendSms(String phone) {
         return smsService.sendSms(phone);
     }

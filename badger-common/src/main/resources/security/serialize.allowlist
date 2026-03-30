@@ -1,0 +1,5 @@
+# 目前只有rpc接口抛出自定义异常需要配置这个
+com.aiolos.common.exception.error.CustomizedException
+com.aiolos.common.enums.error.ErrorEnum
+com.aiolos.badger.enums.MsgSendResultEnum
+com.aiolos.common.model.response.CommonResponse

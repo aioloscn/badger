@@ -2,6 +2,9 @@ config:
   nacos:
     host: ${NACOS_HOST:127.0.0.1}:8848
     
+server:
+  forward-headers-strategy: framework
+
 spring:
   cloud:
     nacos:
@@ -18,3 +21,34 @@ spring:
   config:
     import: 
       - optional:nacos:badger-identity-core-provider-config.yaml
+
+auth:
+  issuer: https://www.volleyshot.com/badger-identity-core-provider
+  clients:
+    - client-id: live-web-client
+      client-name: live-web-client
+      client-authentication-method: none
+      authorization-grant-types:
+        - authorization_code
+        - refresh_token
+      redirect-uris:
+        - ${AUTH_LIVE_WEB_REDIRECT_URI:https://live.volleyshot.com/html/living_room_list.html}
+      scopes:
+        - openid
+        - profile
+      require-authorization-consent: false
+      require-proof-key: true
+    - client-id: plaza-web-client
+      client-name: plaza-web-client
+      client-authentication-method: none
+      authorization-grant-types:
+        - authorization_code
+        - refresh_token
+      redirect-uris:
+        - ${AUTH_PLAZA_WEB_REDIRECT_URI:https://www.volleyshot.com/plaza-web/login}
+      scopes:
+        - openid
+        - profile
+        - read_address
+      require-authorization-consent: false
+      require-proof-key: true

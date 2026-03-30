@@ -8,6 +8,10 @@ public class LoginBO {
     
     @Schema(description = "手机号")
     private String phone;
+
+    @Schema(description = "密码")
+    private String password;
+
     @Schema(description = "短信验证码")
     private String code;
 }

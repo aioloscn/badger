@@ -16,6 +16,10 @@
         </dependency>
         <dependency>
             <groupId>com.aiolos</groupId>
+            <artifactId>common-cloud</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aiolos</groupId>
             <artifactId>common-dubbo</artifactId>
         </dependency>
         <dependency>
@@ -64,6 +68,10 @@
             <groupId>org.apache.shardingsphere</groupId>
             <artifactId>shardingsphere-jdbc-core</artifactId>
             <version>${sharding.jdbc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
     </dependencies>
 

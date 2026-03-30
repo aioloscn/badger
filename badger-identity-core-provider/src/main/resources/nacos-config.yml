@@ -5,6 +5,11 @@
 #    host: ${NACOS_HOST:127.0.0.1}:18848
 #
 #spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/badger?serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+#    username: root
+#    password: root
 #  data:
 #    redis:
 #      port: 6379
@@ -25,3 +30,39 @@
 #    qos-enable: false
 #  registry:
 #    address: nacos://${config.nacos.host}?namespace=dev&username=nacos&password=nacos
+#  consumer:
+#    retries: 2    # 默认2
+#    timeout: 5000 # 全局默认超时，控制消费者调用服务时的等待时间
+#    check: false
+#
+#auth:
+#  issuer: https://auth.aiolos.com
+#  clients:
+#    - client-id: live-web-client
+#      client-name: live-web-client
+#      client-authentication-method: none
+#      authorization-grant-types:
+#        - authorization_code
+#        - refresh_token
+#      redirect-uris:
+#        - ${AUTH_LIVE_WEB_REDIRECT_URI:https://live.aiolos.com/login}
+#      scopes:
+#        - openid
+#        - profile
+#      require-authorization-consent: false
+#      require-proof-key: true
+#
+#    - client-id: plaza-web-client
+#      client-name: plaza-web-client
+#      client-authentication-method: none
+#      authorization-grant-types:
+#        - authorization_code
+#        - refresh_token
+#      redirect-uris:
+#        - ${AUTH_PLAZA_WEB_REDIRECT_URI:https://plaza.aiolos.com/login}
+#      scopes:
+#        - openid
+#        - profile
+#        - read_address
+#      require-authorization-consent: false
+#      require-proof-key: true

@@ -13,7 +13,8 @@ public class IdentityCoreProviderApplication {
 
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(IdentityCoreProviderApplication.class);
-        springApplication.setWebApplicationType(WebApplicationType.NONE);
+        // 为了暴露 OAuth2 的 HTTP 授权端点，必须启用 Web 环境
+        springApplication.setWebApplicationType(WebApplicationType.SERVLET);
         springApplication.run(args);
     }
 }

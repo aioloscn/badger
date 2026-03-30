@@ -1,5 +1,7 @@
 package com.aiolos.badger.user.provider.service;
 
+import com.aiolos.badger.identitycore.dto.AccountTokenDTO;
+import com.aiolos.badger.model.po.User;
 import com.aiolos.badger.user.dto.UserDTO;
 import com.aiolos.badger.user.provider.model.bo.LoginBO;
 import com.aiolos.badger.user.provider.model.vo.UserVO;
@@ -13,6 +15,8 @@ public interface BadgerUserService {
 
     UserVO login(LoginBO loginBO, HttpServletResponse response);
 
+    AccountTokenDTO refreshToken(String refreshToken);
+
     void logout(HttpServletRequest request, HttpServletResponse response);
 
     UserVO getUserById(Long userId);
@@ -21,7 +25,11 @@ public interface BadgerUserService {
 
     void updateUserInfo(UserDTO userDTO);
 
+    void changePasswordBySms(Long userId, String code, String newPassword);
+
     Map<Long, UserVO> batchQueryUserInfo(List<Long> userIds);
 
     UserVO queryByPhone(String phone);
+
+    User getUserByPhoneFromDb(String phone);
 }

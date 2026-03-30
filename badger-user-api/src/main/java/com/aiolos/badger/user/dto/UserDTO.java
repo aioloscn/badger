@@ -26,6 +26,9 @@ public class UserDTO implements Serializable {
     @Schema(description = "手机号")
     private String phone;
 
+    @Schema(description = "密码")
+    private String password;
+
     @Schema(description = "出生时间")
     private LocalDateTime bornTime;
 }
