@@ -2,8 +2,6 @@ package com.aiolos.badger.identitycore.provider.security;
 
 import com.aiolos.badger.user.api.UserApi;
 import com.aiolos.badger.user.dto.UserDTO;
-import com.aiolos.common.enums.error.ErrorEnum;
-import com.aiolos.common.exception.util.ExceptionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.security.core.userdetails.User;
@@ -27,7 +25,7 @@ public class CiamUserDetailsService implements UserDetailsService {
         UserDTO userDTO = userApi.getUserByUsername(username);
 
         if (userDTO == null || userDTO.getUserId() == null) {
-            ExceptionUtil.throwException(ErrorEnum.USER_DOES_NOT_EXIST);
+            throw new UsernameNotFoundException("用户不存在");
         }
         if (StringUtils.isBlank(userDTO.getPassword())) {
             throw new UsernameNotFoundException("User password not configured");

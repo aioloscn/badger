@@ -45,7 +45,7 @@
 #        - authorization_code
 #        - refresh_token
 #      redirect-uris:
-#        - ${AUTH_LIVE_WEB_REDIRECT_URI:https://live.aiolos.com/login}
+#        - ${AUTH_LIVE_WEB_REDIRECT_URI:https://live.aiolos.com/html/living_room_list.html}
 #      scopes:
 #        - openid
 #        - profile

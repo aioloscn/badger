@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginPageController {
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/login";
+    }
+
     /**
      * 交给视图解析器去渲染 templates/login.html
      * 必须是 @Controller

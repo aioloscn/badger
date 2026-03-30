@@ -69,11 +69,11 @@ public class SmsLoginController {
         }
         if (StringUtils.isNotBlank(redirect)) {
             if (isLoginPath(redirect)) {
-                return "redirect:/";
+                return "redirect:/login";
             }
             return "redirect:" + redirect;
         }
-        return "redirect:/";
+        return "redirect:/login";
     }
 
     private boolean isLoginPath(String redirect) {
