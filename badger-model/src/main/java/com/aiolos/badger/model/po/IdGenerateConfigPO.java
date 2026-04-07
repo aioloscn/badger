@@ -40,25 +40,25 @@ public class IdGenerateConfigPO implements Serializable {
     private String remark;
 
     /**
-     * 当前id所在阶段的阈值
+     * 当前id所在阶段的阈值，10000 + 50
      */
     @TableField("next_threshold")
     private Long nextThreshold;
 
     /**
-     * 初始化值
+     * 初始化值，默认从 10000 开始
      */
     @TableField("init_num")
     private Long initNum;
 
     /**
-     * 当前id所在阶段的开始值
+     * 当前id所在阶段的开始值，初始 10000
      */
     @TableField("current_start")
     private Long currentStart;
 
     /**
-     * id递增区间
+     * id递增区间，默认步长 50
      */
     @TableField("step")
     private Integer step;

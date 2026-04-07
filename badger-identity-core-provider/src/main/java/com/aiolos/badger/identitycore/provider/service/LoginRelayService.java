@@ -4,6 +4,8 @@ import com.aiolos.badger.identitycore.provider.security.CiamUserDetailsService;
 import com.aiolos.badger.sms.api.SmsApi;
 import com.aiolos.badger.user.api.UserApi;
 import com.aiolos.badger.user.dto.UserDTO;
+import com.aiolos.common.enums.error.ErrorEnum;
+import com.aiolos.common.exception.util.ExceptionUtil;
 import com.aiolos.common.model.response.CommonResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -34,7 +36,7 @@ public class LoginRelayService {
      */
     public CommonResponse sendSmsCode(String phone) {
         if (StringUtils.isBlank(phone)) {
-            throw new IllegalArgumentException("手机号不能为空");
+            ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR.setErrMsg("手机号不能为空"));
         }
         return smsApi.sendSms(phone.trim());
     }
@@ -46,11 +48,11 @@ public class LoginRelayService {
      */
     public UserDetails authenticateBySms(String phone, String code) {
         if (StringUtils.isAnyBlank(phone, code)) {
-            throw new IllegalArgumentException("手机号或验证码不能为空");
+            ExceptionUtil.throwException(ErrorEnum.BIND_EXCEPTION_ERROR.setErrMsg("手机号或验证码不能为空"));
         }
         UserDTO userDTO = userApi.authenticateBySms(phone.trim(), code.trim());
         if (userDTO == null || userDTO.getUserId() == null) {
-            throw new IllegalArgumentException("短信登录失败");
+            ExceptionUtil.throwException(ErrorEnum.LOGIN_FAILED.setErrMsg("短信登录失败"));
         }
         return ciamUserDetailsService.loadUserByUsername(phone.trim());
     }

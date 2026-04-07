@@ -1,5 +1,6 @@
 package com.aiolos.badger.user.provider.service.impl;
 
+import com.aiolos.badger.common.redis.SmsRedisKeyBuilder;
 import com.aiolos.badger.common.redis.UserRedisKeyBuilder;
 import com.aiolos.badger.identitycore.api.AccountTokenApi;
 import com.aiolos.badger.identitycore.dto.AccountTokenDTO;
@@ -9,8 +10,6 @@ import com.aiolos.badger.model.po.UserPhoneMapping;
 import com.aiolos.badger.service.UserPhoneMappingService;
 import com.aiolos.common.enums.error.ErrorEnum;
 import com.aiolos.common.exception.util.ExceptionUtil;
-import com.aiolos.common.redis.builder.CommonSmsRedisKeyBuilder;
-import com.aiolos.common.redis.builder.CommonUserRedisKeyBuilder;
 import com.aiolos.common.util.ConvertBeanUtil;
 import com.aiolos.badger.model.po.User;
 import com.aiolos.badger.service.UserService;
@@ -31,7 +30,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -61,9 +58,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
     @Resource
     private UserPhoneMappingService userPhoneMappingService;
     @Resource
-    private CommonUserRedisKeyBuilder commonUserRedisKeyBuilder;
-    @Resource
-    private CommonSmsRedisKeyBuilder commonSmsRedisKeyBuilder;
+    private SmsRedisKeyBuilder smsRedisKeyBuilder;
     @Resource
     private UserRedisKeyBuilder userRedisKeyBuilder;
     @Resource
@@ -90,7 +85,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
 
         UserVO userVO;
         if (useSmsLogin) {
-            String smsRedisKey = commonSmsRedisKeyBuilder.buildSmsLoginCodeKey(loginBO.getPhone());
+            String smsRedisKey = smsRedisKeyBuilder.buildSmsLoginCodeKey(loginBO.getPhone());
             Object redisVal = redisTemplate.opsForValue().get(smsRedisKey);
             if (redisVal == null) {
                 ExceptionUtil.throwException(ErrorEnum.SMS_CODE_EXPIRED);
@@ -130,7 +125,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         }
 
         userVO.setPassword(null);
-        redisTemplate.opsForValue().set(commonUserRedisKeyBuilder.buildUserInfoKey(userVO.getUserId()), userVO, 7, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(userRedisKeyBuilder.buildUserInfoKey(userVO.getUserId()), userVO, 7, TimeUnit.DAYS);
         AccountTokenDTO tokenDTO = accountTokenApi.createToken(userVO.getUserId());
         userVO.setToken(tokenDTO.getAccessToken());
         userVO.setRefreshToken(tokenDTO.getRefreshToken());
@@ -160,7 +155,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
             redisTemplate.delete(tokenKey);
             return;
         }
-        redisTemplate.delete(Arrays.asList(tokenKey, commonUserRedisKeyBuilder.buildUserInfoKey(userId)));
+        redisTemplate.delete(Arrays.asList(tokenKey, userRedisKeyBuilder.buildUserInfoKey(userId)));
     }
 
     private Long getUserIdByTokenKey(String tokenKey) {
@@ -192,7 +187,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
             return new UserVO();
         }
         
-        String userKey = commonUserRedisKeyBuilder.buildUserInfoKey(userId);
+        String userKey = userRedisKeyBuilder.buildUserInfoKey(userId);
         Object obj = redisTemplate.opsForValue().get(userKey);
         if (obj != null) {
             UserVO userVO = ConvertBeanUtil.convert(obj, UserVO.class);
@@ -224,7 +219,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         // 目前情况分库分表
         boolean updated = userService.updateById(ConvertBeanUtil.convert(userDTO, User.class));
         if (updated) {
-            redisTemplate.delete(commonUserRedisKeyBuilder.buildUserInfoKey(userDTO.getUserId()));
+            redisTemplate.delete(userRedisKeyBuilder.buildUserInfoKey(userDTO.getUserId()));
             updateUserInfoProducer.deleteUserCache(userDTO.getUserId());
         }
     }
@@ -243,7 +238,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
             ExceptionUtil.throwException(ErrorEnum.USER_DOES_NOT_EXIST);
         }
 
-        String smsRedisKey = commonSmsRedisKeyBuilder.buildSmsLoginCodeKey(user.getPhone());
+        String smsRedisKey = smsRedisKeyBuilder.buildSmsLoginCodeKey(user.getPhone());
         Object redisVal = redisTemplate.opsForValue().get(smsRedisKey);
         if (redisVal == null) {
             ExceptionUtil.throwException(ErrorEnum.SMS_CODE_EXPIRED);
@@ -262,7 +257,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
         }
 
         redisTemplate.delete(smsRedisKey);
-        redisTemplate.delete(commonUserRedisKeyBuilder.buildUserInfoKey(userId));
+        redisTemplate.delete(userRedisKeyBuilder.buildUserInfoKey(userId));
         redisTemplate.delete(userRedisKeyBuilder.buildUserPhoneKey(user.getPhone()));
     }
 
@@ -276,7 +271,7 @@ public class BadgerUserServiceImpl implements BadgerUserService {
             return Maps.newHashMap();
         }
 
-        List<String> keyList = userIds.stream().map(userId -> commonUserRedisKeyBuilder.buildUserInfoKey(userId)).collect(Collectors.toList());
+        List<String> keyList = userIds.stream().map(userId -> userRedisKeyBuilder.buildUserInfoKey(userId)).collect(Collectors.toList());
         List<UserVO> dtoListInRedis = redisTemplate.opsForValue().multiGet(keyList).stream()
                 .filter(Objects::nonNull).map(x -> ConvertBeanUtil.convert(x, UserVO.class)).collect(Collectors.toList());
 
@@ -305,11 +300,11 @@ public class BadgerUserServiceImpl implements BadgerUserService {
 
         // 从数据库查询出来的数据缓存到redis
         if (!CollectionUtils.isEmpty(dbQueryResult)) {
-            Map<String, UserVO> dbQueryMap = dbQueryResult.stream().collect(Collectors.toMap(dto -> commonUserRedisKeyBuilder.buildUserInfoKey(dto.getUserId()), Function.identity()));
+            Map<String, UserVO> dbQueryMap = dbQueryResult.stream().collect(Collectors.toMap(dto -> userRedisKeyBuilder.buildUserInfoKey(dto.getUserId()), Function.identity()));
             redisTemplate.opsForValue().multiSet(dbQueryMap);
             // 批量设置过期时间
             redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-                dbQueryMap.keySet().forEach(key -> connection.keyCommands().expire(key.getBytes(), commonUserRedisKeyBuilder.randomExpireSeconds( 60 * 60 * 24 * 7)));
+                dbQueryMap.keySet().forEach(key -> connection.keyCommands().expire(key.getBytes(), userRedisKeyBuilder.randomExpireSeconds( 60 * 60 * 24 * 7)));
                 return null;
             });
 

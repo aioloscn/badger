@@ -94,6 +94,7 @@ public class IdGeneratorApiImpl implements IdGeneratorApi {
             log.info("从无序队列取出: {}", nonSeqId);
             return nonSeqId;
         } else {
+            // ID队列为空，阻塞式兜底补号段
             return emergencySyncIdQueue(localNonSeqIdBO);
         }
     }
@@ -196,7 +197,7 @@ public class IdGeneratorApiImpl implements IdGeneratorApi {
                     localSeqIdMap.put(po.getId(), newBO);
                     log.info("有序队列缓存ID: {}", JSONUtil.toJsonStr(localSeqIdMap));
                 } else {
-                    // 如果参数bo不为空，代表是以阻塞的方式更新的，只特换idQueue，根据happens-before原则其他线程能感知到变更
+                    // 如果参数bo不为空，代表是以阻塞的方式更新的，只替换idQueue，根据happens-before原则其他线程能感知到变更
                     if (bo != null) {
                         buildIdQueue(po.getId(), bo, nextThreshold, currentStart);
                         log.info("阻塞更新无序队列ID集合: {}", JSONUtil.toJsonStr(bo));

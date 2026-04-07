@@ -14,6 +14,7 @@ services:
       - JAVA_OPTS=-Xms256m -Xmx512m -Xss256k -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/logs/badger-identity-core-provider
     ports:
       - '29931:29931'
+      - '18880:18880'
     volumes:
       - D:\tmp\logs\badger-identity-core-provider:/tmp/logs/badger-identity-core-provider
     deploy:
